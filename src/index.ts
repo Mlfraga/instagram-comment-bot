@@ -5,7 +5,7 @@ import * as dotenv from "dotenv";
 dotenv.config();
 
 (async () => {
-  const browser = await puppeteer.launch({ headless: true })
+  const browser = await puppeteer.launch({ headless: false })
   const page = await browser.newPage();
   await page.goto('https://instagram.com/accounts/login', { waitUntil: 'networkidle2' });
 
@@ -24,30 +24,33 @@ dotenv.config();
 
   let error = false;
 
+  const people = ['@eululu_', '@azalim12', '@luccaalvesc', '@xanda1235'];
+  let indexPeople = 0;
+
   while (error === false) {
-    await page.type('textarea[aria-label="Adicione um comentário..."]', "@eululu_", { delay: 150 });
+    if (indexPeople === 3) [
+      indexPeople = 0
+    ]
+
+    await page.type('textarea[aria-label="Adicione um comentário..."]', people[indexPeople], { delay: 150 });
 
     let publishButton = await page.$x('//button[contains(text(), "Publicar")]');
-
 
     let [tryAgainButton, ...rest] = await page.$x('//button[contains(text(), "Tentar novamente")]');
 
     if (!tryAgainButton) {
       comments++;
 
-      const buttonClickResponse = await publishButton[0].click();
+      await publishButton[0].click();
 
-      let [secoundTryAgainButton, ...rest] = await page.$x('//button[contains(text(), "Tentar novamente")]');
+      console.log(`${comments} ${tryAgainButton}`);
 
-      if (!secoundTryAgainButton) {
-        console.log(`${comments} ${tryAgainButton} ${buttonClickResponse}`);
-      }
     } else {
-      setTimeout(pollDOM, 10000);
+      await tryAgainButton.click();
     }
-  }
 
-  // await page.waitFor(3000);
+    indexPeople++;
+  }
 
 })();
 
