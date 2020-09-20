@@ -21,18 +21,17 @@ dotenv.config();
   await page.goto('https://www.instagram.com/p/CFSFOF-laiP/');
 
   let comments = 0;
-
   let error = false;
 
-  const people = ['@eululu_', '@azalim12', '@luccaalvesc', '@xanda1235'];
+  const people = ['@eululu_'];
   let indexPeople = 0;
 
   while (error === false) {
-    if (indexPeople === 3) [
+    if (indexPeople === 1) [
       indexPeople = 0
     ]
 
-    await page.type('textarea[aria-label="Adicione um comentário..."]', people[indexPeople], { delay: 150 });
+    await page.type('textarea[aria-label="Adicione um comentário..."]', people[indexPeople], { delay: 600 });
 
     let publishButton = await page.$x('//button[contains(text(), "Publicar")]');
 
@@ -43,17 +42,17 @@ dotenv.config();
 
       await publishButton[0].click();
 
-      console.log(`${comments} ${tryAgainButton}`);
-
+      console.log(`${comments} comentários.`);
     } else {
-      await tryAgainButton.click();
+      setTimeout(async () => {
+        try {
+          await tryAgainButton.click();
+        } catch {
+          await publishButton[0].click();
+        }
+      }, 5000)
     }
 
     indexPeople++;
   }
-
 })();
-
-function pollDOM() {
-  console.log('esperando');
-}
