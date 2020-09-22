@@ -27,9 +27,9 @@ dotenv.config();
   let indexPeople = 0;
 
   while (error === false) {
-    if (indexPeople === 1) [
+    if (indexPeople === 1) {
       indexPeople = 0
-    ]
+    }
 
     await page.type('textarea[aria-label="Adicione um comentário..."]', people[indexPeople], { delay: 600 });
 
@@ -38,11 +38,7 @@ dotenv.config();
     let [tryAgainButton, ...rest] = await page.$x('//button[contains(text(), "Tentar novamente")]');
 
     if (!tryAgainButton) {
-      comments++;
-
       await publishButton[0].click();
-
-      console.log(`${comments} comentários.`);
     } else {
       setTimeout(async () => {
         try {
@@ -52,6 +48,21 @@ dotenv.config();
         }
       }, 5000)
     }
+
+    page.once('response', response => {
+      if (response.url().includes("comments")) {
+        if (response.url().includes("add")) {
+          console.log("response code: ", response.status());
+
+          const status = response.status();
+          if (status === 200) {
+            comments++;
+            console.log(`${comments} comentários. ${status}`);
+
+          }
+        }
+      }
+    });
 
     indexPeople++;
   }
